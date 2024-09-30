@@ -1,1 +1,2 @@
 # Fast-Food-Ratings
+  In this project we will be creating a website where user can input and rate fast food workers from different types of fast food place and specific locations. This will include seperating different types of fast food places then locations for each type and lastly all the kinds of workers in each location. Users will be the ones to add different workers for each location as well as rate them on different atributes, like speed and kindness. Then we will have to determine the different types of fast food and the specific locations.
