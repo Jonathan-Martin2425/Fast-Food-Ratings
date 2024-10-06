@@ -1,8 +1,8 @@
 User Stories:
-1)
-2)
-3)
-4)
+1) As a frequent McDonald's customer, I want to find the locations with the fastest service near my workplace, so that I can choose to go there for my lunch break at work.
+2) As a Cheapskate who enjoys fast food, I want to find the place with the cheapest food near my house, so that I can save as much money as possible getting fast food.
+3) As a fast food critic, I want to express my review of certain fast food products, so that others can stay away from bad fast food items.
+4) As a recent customer of Poppyes, I want to express the bad service I experienced today at KFC, so that other people can avoid that location.
 5)
 6)
 7)
@@ -12,10 +12,14 @@ User Stories:
 11)
 12)
 Exceptions:
-1)
-2)
-3)
-4)
+1) Desired type of fast food place can't be found:
+    - a separate query where users can add types of fast-food places
+2) Review with too much text
+    - Set a limit to the number of words
+3) Review with false information
+    - ask user for verification of purchase, such as a receipt or photos
+4) Desired location can't be found
+    - a separate query where users can add store locations for fast-food places they specify
 5)
 6)
 7)
