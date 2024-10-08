@@ -3,14 +3,14 @@ User Stories:
 2) As a Cheapskate who enjoys fast food, I want to find the place with the cheapest food near my house, so that I can save as much money as possible getting fast food.
 3) As a fast food critic, I want to express my review of certain fast food products, so that others can stay away from bad fast food items.
 4) As a recent customer of Poppyes, I want to express the bad service I experienced today at KFC, so that other people can avoid that location.
-5)
-6)
-7)
-8)
-9)
-10)
-11)
-12)
+5) As a person with disabilites that enjoys fast food often, I would like to know which restaurants have accessible accomodations.
+6) As a clean person, I want to know if the certain fast food place I go to has clean tables, dining area, and bathrooms.
+7) As a fast food connoiseur, I want to have access to fast food ratings, so that I may only eat tasty meals.
+8) As a person looking to work in the fast food industry, I want to be able to see what the public has to say about a certain place before applying.
+9) As a person that only enjoys ethically sourced food, I want to have access to food ratings, so that the place I support also aligns with my values.
+10) As a person into fitness, I want to know which places serve the most protein in their large combo for gains.
+11) As a person who is conscientious of which I consume, I want to know all the ingredients, nutrition, and chemicals associated with my meal purchase.
+12) As a person that is looking to open my own fast food place, I want to know how the public views my competition and take some inspiration to take their customers.
 Exceptions:
 1) Desired type of fast food place can't be found:
     - a separate query where users can add types of fast-food places
@@ -20,11 +20,19 @@ Exceptions:
     - ask user for verification of purchase, such as a receipt or photos
 4) Desired location can't be found
     - a separate query where users can add store locations for fast-food places they specify
-5)
-6)
-7)
-8)
-9)
-10)
-11)
-12)
+5) Cannot create account at this time:
+    - we don't want to have multiple accounts from the same person/address to prevent spam
+6) Exceeding fast food rating
+    - our rating is based on a scale from 1-5 stars and cannot be less than 1 or greater than 5
+7) Empty review not valid
+    - a person begins a review and doesn't have any text
+8) Image upload 
+     - need to make sure the image in the review is in the right format and size
+9) Review not about fast food 
+    - a review by someone trolling on the internet or just irrelevant 
+10) Username already taken
+    - person tries to create an username with their common name
+11) You have been banned
+    - reviewer has broken our policies multiple times and need their account banned
+12) Account does not exist
+    - person wants to share a review with another user and inputs wrong username
