@@ -19,4 +19,12 @@ After clicking on the location Randy calls GET "/Dominos/location/42" where he f
 
 Pleased, Randy decides to order from the location and enjoys his pizza when it arrives in less than 30 min.
 
-### 3. Viewing Food Reviews Example Flow
+### 3. Recommendations based on time spent 
+
+ A person who's into fitness cares a lot about what they eat/consume throughout the day. They decide that cooking is not an option today after a long day at work and gym. Visitng our fast food ratings website gives them a spectrum of options to chose from and they are indecisive about eating fast food when they really shouldn't. That's when we recommend a full course meal at Five Guys because they spent a long period of time hovering over cheeseburger reviews while on our website.
+
+They are now set to go an enjoy their meal. To do such influence:
+  - Person begins by looking at reviews in the /front_page
+  - then /reviews/location/menu_items/10 and they remain
+  - finally we recommend a cheeseburger based on the activity/data
+It was a really good meal.
