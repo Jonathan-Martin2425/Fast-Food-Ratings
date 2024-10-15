@@ -107,9 +107,9 @@ returns a success message and adds it to the reviews of the location
 ]
 ```
 
-### 5. name - `{fast_food_place}/location/{location_id}` (GET)
+### 5. Handling - `{fast_food_place}/location/{location_id}` (GET)
 
-  given wrong fast_food_place or location_id ...  
+  Given wrong fast_food_place or location_id we would have catch statements to compensate for some oversight. This will also help us improve the user experience if we see this happening a lot on our end.
 
 **Request**
 
@@ -117,7 +117,67 @@ returns a success message and adds it to the reviews of the location
 
 [
   {
-    "Something": "string"
+    "location": "string"
+    "location_id": "integer"
+  }
+]
+```
+
+**Response**
+
+```json
+
+[
+  {
+    "response": "string"
+    "error_message": "boolean"
+  }
+]
+```
+
+### 6. Recommendations - `{location_id}/recommend/` (GET)
+
+  Person accessing our website will be able to see our recommendations for them based on their information and passed searches.
+
+**Request**
+
+```json
+
+[
+  {
+    "location": "string"
+    "reviews": "string"
+    "prices": "number"
+    "quality": "string"
+  }
+]
+```
+
+**Response**
+
+```json
+
+[
+  {
+    "recommend": "string"
+    "stats": "integer"
+  }
+]
+```
+
+### 7. Update to see new reviews - `{fast_food_place}/updates/qualities` (GET)
+
+  Update the information shown on the website live to allow our users to have the most up to date and relevant ratings. This will help with their last minute decision making if they spot interesting reviews.
+
+**Request**
+
+```json
+
+[
+  {
+    "live_input": "string"
+    "reviews": "string"
+    "time": "number"
   }
 ]
 ```
@@ -133,9 +193,9 @@ returns a success message and adds it to the reviews of the location
 ]
 ```
 
-### 6. name - `choose path from previous ones` (GET)
+### 8. Notifications - `{fast_food_place}/users/person` (GET)
 
-  description start
+  Send notifications to all of our users on our website to let them know of changes. A person may have interacted with their posting or we are just saying hello to encourage engagement.
 
 **Request**
 
@@ -143,7 +203,9 @@ returns a success message and adds it to the reviews of the location
 
 [
   {
-    "Something": "string"
+    "posting": "string"
+    "deals": "string"
+    "prices": "integer"
   }
 ]
 ```
@@ -154,59 +216,7 @@ returns a success message and adds it to the reviews of the location
 
 [
   {
-    "Something": "string"
-  }
-]
-```
-
-### 7. name - `choose path from previous ones` (GET)
-
-  description start
-
-**Request**
-
-```json
-
-[
-  {
-    "Something": "string"
-  }
-]
-```
-
-**Response**
-
-```json
-
-[
-  {
-    "Something": "string"
-  }
-]
-```
-
-### 8. name - `choose path from previous ones` (GET)
-
-  description start
-
-**Request**
-
-```json
-
-[
-  {
-    "Something": "string"
-  }
-]
-```
-
-**Response**
-
-```json
-
-[
-  {
-    "Something": "string"
+    "notification": "string"
   }
 ]
 ```
