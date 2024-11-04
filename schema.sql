@@ -73,6 +73,9 @@ CREATE TABLE visited(
 INSERT INTO brands (name, service_type)
 VALUES ('McDonalds', 'Fast Food');
 
+INSERT INTO brands (name, service_type)
+VALUES ('Del Taco', 'Fast Food');
+
 INSERT INTO food (brand_id, name)
 VALUES (1, 'Big Mac');
 
@@ -82,6 +85,12 @@ VALUES (1, 1, 'Burger');
 INSERT INTO locations (brand_id, address)
 VALUES (1,  '275 Madonna Rd, San Luis Obispo, CA 93401');
 
+INSERT INTO locations (brand_id, address)
+VALUES (1,  '123 Bob Dr, Tustin, CA 92780');
+
+INSERT INTO locations (brand_id, address)
+VALUES (2,  '13742 Red Hill Ave, Tustin, CA 92780');
+
 INSERT INTO Hours (business_id, day_of_week, hours)
 VALUES (1, 'Monday', 'Open 24 Hours'),
 (1, 'Tuesday', 'Open 24 Hours'),
@@ -89,7 +98,14 @@ VALUES (1, 'Monday', 'Open 24 Hours'),
 (1, 'Thursday', 'Open 24 Hours'),
 (1, 'Friday', 'Open 24 Hours'),
 (1, 'Saturday', 'Open 24 Hours'),
-(1, 'Sunday', 'Open 24 Hours');
+(1, 'Sunday', 'Open 24 Hours'),
+(2, 'Monday', 'Open 24 Hours'),
+(2, 'Tuesday', 'Open 24 Hours'),
+(2, 'Wednesday', 'Open 24 Hours'),
+(2, 'Thursday', 'Open 24 Hours'),
+(2, 'Friday', 'Open 24 Hours'),
+(2, 'Saturday', 'Open 24 Hours'),
+(2, 'Sunday', 'Open 24 Hours');
 
 INSERT INTO users (name)
 VALUES ('Anonymous');
