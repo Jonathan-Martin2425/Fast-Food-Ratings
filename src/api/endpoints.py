@@ -10,7 +10,6 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-
-@router.get("/")
+@router.get("/{brand_id}")
 async def root():
     return {"message": "Welcome to Fast-Food-Ratings, for all your fast food needs."}

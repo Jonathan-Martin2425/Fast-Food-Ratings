@@ -2,6 +2,8 @@ from fastapi import FastAPI, exceptions
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from src.api import endpoints
+import sqlalchemy
+from src import database as db
 import json
 import logging
 import sys
@@ -35,6 +37,34 @@ async def validation_exception_handler(request, exc):
 
     return JSONResponse(response, status_code=422)
 
+
+"""
+root of the website
+shows opening message and all brands with their locations
+"""
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Fast-Food-Ratings, for all your fast food needs."}
+    res = []
+    with db.engine.begin() as connection:
+        brands = connection.execute(sqlalchemy.text("SELECT address, name FROM brands "
+                                                    "JOIN locations ON b_id = brand_id"))
+
+    for b in brands:
+        brand = {
+            "brand": b.name,
+            "addresses": []
+        }
+
+        bIsThere = False
+        for cur in res:
+            if cur["brand"] == b.name:
+                bIsThere = True
+        if not bIsThere:
+            res.append(brand)
+
+        for cur in res:
+            if b.address not in cur["addresses"] and b.name == cur["brand"]:
+                cur["addresses"].append(b.address)
+    res.insert(0, {"message": "Welcome to Fast-Food-Ratings, for all your fast food needs."})
+
+    return res
