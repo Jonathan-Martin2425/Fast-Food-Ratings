@@ -13,13 +13,11 @@ CREATE TABLE  Food(
   name text not null
 );
 
-CREATE TABLE  Catagories(
+CREATE TABLE  Categories(
   food_id int not null,
   FOREIGN KEY (food_id) REFERENCES food(f_id),
-  brand_id int not null,
-  FOREIGN KEY (brand_id) REFERENCES Brands(b_id),
   created_at timestamp with time zone null default now(),
-  catagory text not null
+  category text not null
 );
 
 CREATE TABLE  Locations(
@@ -71,25 +69,38 @@ CREATE TABLE visited(
 -- every table has at least 1 starting value, including reviews
 
 INSERT INTO brands (name, service_type)
-VALUES ('McDonalds', 'Fast Food');
-
-INSERT INTO brands (name, service_type)
-VALUES ('Del Taco', 'Fast Food');
+VALUES ('McDonalds', 'Fast Food'),
+('Del Taco', 'Fast Food'),
+('Dominos', 'Pizza Delivery'),
+('Five Guys', 'Fast Food');
 
 INSERT INTO food (brand_id, name)
-VALUES (1, 'Big Mac');
+VALUES (1, 'Big Mac'),
+(1, 'Fries'),
+(2, 'The Del Taco'),
+(2, 'Crinkle-Cut Fries'),
+(3, 'Meat Lovers'),
+(3, 'Pepperoni'),
+(4, 'Single Cheeseburger'),
+(4, 'Cajun Fries');
 
-INSERT INTO catagories (brand_id, food_id, catagory)
-VALUES (1, 1, 'Burger');
+INSERT INTO categories (food_id, category)
+VALUES (1, 'Burger'),
+(2, 'Side'),
+(3, 'Taco'),
+(4, 'Side'),
+(5, 'Pizza'),
+(6, 'Pizza'),
+(7, 'Burger'),
+(8, 'Side');
 
 INSERT INTO locations (brand_id, address)
-VALUES (1,  '275 Madonna Rd, San Luis Obispo, CA 93401');
+VALUES (1,  '275 Madonna Rd, San Luis Obispo, CA 93401'),
+(1,  '123 Bob Dr, Tustin, CA 92780'),
+(2,  '13742 Red Hill Ave, Tustin, CA 92780'),
+(3, '866 Foothill Blvd, San Luis Obispo, CA 93405'),
+(4, '763 Foothill Blvd, San Luis Obispo, CA 93405');
 
-INSERT INTO locations (brand_id, address)
-VALUES (1,  '123 Bob Dr, Tustin, CA 92780');
-
-INSERT INTO locations (brand_id, address)
-VALUES (2,  '13742 Red Hill Ave, Tustin, CA 92780');
 
 INSERT INTO Hours (business_id, day_of_week, hours)
 VALUES (1, 'Monday', 'Open 24 Hours'),
@@ -99,16 +110,39 @@ VALUES (1, 'Monday', 'Open 24 Hours'),
 (1, 'Friday', 'Open 24 Hours'),
 (1, 'Saturday', 'Open 24 Hours'),
 (1, 'Sunday', 'Open 24 Hours'),
-(2, 'Monday', 'Open 24 Hours'),
-(2, 'Tuesday', 'Open 24 Hours'),
-(2, 'Wednesday', 'Open 24 Hours'),
-(2, 'Thursday', 'Open 24 Hours'),
-(2, 'Friday', 'Open 24 Hours'),
-(2, 'Saturday', 'Open 24 Hours'),
-(2, 'Sunday', 'Open 24 Hours');
+(2, 'Monday', '7am-10pm'),
+(2, 'Tuesday', '7am-10pm'),
+(2, 'Wednesday', '7am-10pm'),
+(2, 'Thursday', '7am-10pm'),
+(2, 'Friday', '7am-12am'),
+(2, 'Saturday', '8am-2am'),
+(2, 'Sunday', '8am-10pm'),
+(3, 'Monday', 'Open 24 Hours'),
+(3, 'Tuesday', 'Open 24 Hours'),
+(3, 'Wednesday', 'Open 24 Hours'),
+(3, 'Thursday', 'Open 24 Hours'),
+(3, 'Friday', 'Open 24 Hours'),
+(3, 'Saturday', 'Open 24 Hours'),
+(3, 'Sunday', 'Open 24 Hours'),
+(4, 'Monday', '11am-2am'),
+(4, 'Tuesday', '11am-2am'),
+(4, 'Wednesday', '11am-2am'),
+(4, 'Thursday', '11am-2am'),
+(4, 'Friday', '11am-2am'),
+(4, 'Saturday', '11am-2am'),
+(4, 'Sunday', '11am-2am'),
+(5, 'Monday', '11am-10pm'),
+(5, 'Tuesday', '11am-10pm'),
+(5, 'Wednesday', '11am-10pm'),
+(5, 'Thursday', '11am-10pm'),
+(5, 'Friday', '11am-10pm'),
+(5, 'Saturday', '11am-10pm'),
+(5, 'Sunday', '11am-10pm');
 
 INSERT INTO users (name)
-VALUES ('Anonymous');
+VALUES ('Anonymous'),
+('Karen Willoughby'),
+('Randy Jr');
 
 INSERT INTO reviews(location_id, publisher_id, 
 service_rating, quality_rating, cleanliness_rating, description)

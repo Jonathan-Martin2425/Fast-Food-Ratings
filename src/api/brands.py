@@ -5,8 +5,8 @@ import sqlalchemy
 from src import database as db
 
 router = APIRouter(
-    prefix="/endpoints",
-    tags=["endpoints"],
+    prefix="/brands",
+    tags=["brands"],
     dependencies=[Depends(auth.get_api_key)],
 )
 
@@ -17,6 +17,29 @@ class Review(BaseModel):
     service: int
     quality: int
     cleanliness: int
+
+
+# given a brand id, returns all its locations
+# if there are no locations or brand doesn't exist, raises 400 error with message
+@router.get("/{brand_id}/")
+def get_locations(brand_id: int):
+    res = []
+    with db.engine.begin() as connection:
+        locations = connection.execute(
+            sqlalchemy.text("SELECT name, address FROM brands "
+                            "JOIN locations ON b_id = brand_id "
+                            "WHERE brand_id = :brand"), {"brand": brand_id})
+        for location in locations:
+            res.append({
+                "address": location.address,
+                "brand": location.name
+            })
+
+    if len(res) <= 0:
+        # raises bad input error on incorrect location or brand id
+        raise HTTPException(status_code=400, detail="There is no such brand")
+
+    return res
 
 
 # Given a correct location with its brand id, returns them and all reviews from that location
@@ -76,10 +99,15 @@ def submit_review(review: Review, brand_id: int, location_id: int):
         # gets brand name and address/location_name from ids
         brand_dict = {"location": location_id,
                       "brand": brand_id}
-        brand_name, address = connection.execute(
-            sqlalchemy.text("SELECT name, address FROM brands "
-                            "JOIN locations ON b_id = brand_id "
-                            "WHERE l_id = :location AND b_id = :brand"), brand_dict).one()
+        try:
+            brand_name, address = connection.execute(
+                sqlalchemy.text("SELECT name, address FROM brands "
+                                "JOIN locations ON b_id = brand_id "
+                                "WHERE brand_id = :brand AND l_id = :location"), brand_dict).one()
+        except sqlalchemy.exc.NoResultFound:
+
+            # raises bad input error on incorrect location or brand id
+            raise HTTPException(status_code=400, detail="There is no such location")
 
         # adds review to reviews table
         review_data = {
@@ -88,11 +116,15 @@ def submit_review(review: Review, brand_id: int, location_id: int):
             "description": review.description,
             "s": review.service,
             "q": review.quality,
-            "c": review.cleanliness
+            "c": review.cleanliness,
+            "location": address,
         }
         connection.execute(sqlalchemy.text("INSERT INTO reviews (location_id, publisher_id, description, "
                                            "service_rating, quality_rating, cleanliness_rating) "
                                            "VALUES (:l_id, :p_id, :description, :s, :q, :c)"), review_data)
+
+        connection.execute(sqlalchemy.text("INSERT INTO visited (user_id, visit) "
+                                           "VALUES (:p_id, :location)"), review_data)
 
         # returns review made to user
         res = [{

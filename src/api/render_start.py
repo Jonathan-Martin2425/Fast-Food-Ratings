@@ -1,7 +1,7 @@
 from fastapi import FastAPI, exceptions
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from src.api import endpoints
+from src.api import brands
 import sqlalchemy
 from src import database as db
 import json
@@ -23,7 +23,7 @@ app = FastAPI(
     },
 )
 
-app.include_router(endpoints.router)
+app.include_router(brands.router)
 
 
 @app.exception_handler(exceptions.RequestValidationError)
