@@ -100,6 +100,6 @@ def submit_review(review: Review, brand_id: int, location_id: int):
             "brand": brand_name,
             "address": address,
             "description": review.description,
-            "ratings (S, Q, C)": [review.service, review.quality, review.cleanliness],
+            "ratings (S, Q, C)": [review.service, review.quality, review.cleanliness]
         }]
     return res
