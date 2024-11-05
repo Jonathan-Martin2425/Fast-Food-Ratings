@@ -84,6 +84,8 @@ def get_reviews(brand_id: int, location_id: int):
                 "ratings (S, Q, C)": [review.service_rating, review.quality_rating, review.cleanliness_rating],
                 "date_published": review.date_published
             })
+        if len(res) == 1:
+            res.append({"message": "There are no reviews for this locations. Try making one!"})
 
     return res
 

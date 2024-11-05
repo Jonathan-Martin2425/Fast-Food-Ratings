@@ -54,6 +54,7 @@ Then Karen goes on about her day knowing fewer people, like her, will be going t
 1. curl -X 'GET' \
   'http://127.0.0.1:3000/brands/1/' \
   -H 'accept: application/json' \
+  -H 'access_token: [API_KEY]'
 2.
 ```json
 [
@@ -79,6 +80,7 @@ Then Karen goes on about her day knowing fewer people, like her, will be going t
 1. curl -X 'GET' \
   'http://127.0.0.1:3000/brands/1/location/1' \
   -H 'accept: application/json' \
+  -H 'access_token: [API_KEY]'
 2. 
 ```json
 [

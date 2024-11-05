@@ -146,7 +146,9 @@ VALUES ('Anonymous'),
 
 INSERT INTO reviews(location_id, publisher_id, 
 service_rating, quality_rating, cleanliness_rating, description)
-VALUES (1, 1, 0, 0, 0, 'Complete garbage, will never go here again');
+VALUES (1, 1, 0, 0, 0, 'Complete garbage, will never go here again'),
+(4, 1, 10, 10, 10, 'Best Dominos Ever. took less than 10 min from ordering to get food, it was somehow better than other dominos I have gone too AND was spotless down to the area behind the drinks.');
 
 INSERT INTO visited (user_id, visit)
-VALUES (1, 'McDonalds, 275 Madonna Rd, San Luis Obispo, CA 93401');
+VALUES (1, '275 Madonna Rd, San Luis Obispo, CA 93401'),
+(1, '866 Foothill Blvd, San Luis Obispo, CA 93405');
