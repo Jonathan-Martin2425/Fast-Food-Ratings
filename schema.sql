@@ -49,7 +49,7 @@ CREATE TABLE  Reviews(
   r_id int generated always as identity not null PRIMARY KEY,
   location_id int not null,
   FOREIGN KEY (location_id) REFERENCES Locations(l_id),
-  created_at timestamp with time zone null default now(),
+  date_published timestamp with time zone null default now(),
   publisher_id int not null REFERENCES Users(u_id),
   service_rating int not null,
   quality_rating int not null,
@@ -116,6 +116,3 @@ VALUES (1, 1, 0, 0, 0, 'Complete garbage, will never go here again');
 
 INSERT INTO visited (user_id, visit)
 VALUES (1, 'McDonalds, 275 Madonna Rd, San Luis Obispo, CA 93401');
-
-
-
