@@ -6,3 +6,6 @@
   Users will be the ones to rate the food, add different workers and rate them too for each location as well as rate 
   them on different attributes, like speed and kindness for the workers and price, taste or quality. 
   Then we will have to determine the different types of fast food, the specific locations and the food they have.
+
+### Website  - https://fast-food-ratings.onrender.com/
+  API key: ILOVECHICKFILA
