@@ -9,3 +9,5 @@
 
 ### Website  - https://fast-food-ratings.onrender.com/
   API key: ILOVECHICKFILA
+
+### ER Diagram - https://lucid.app/lucidchart/3089c797-3789-48f6-b4ad-1a1db753c259/edit?viewport_loc=-975%2C-976%2C2915%2C1269%2C0_0&invitationId=inv_14292d0c-6120-490d-804e-f278764cdb5d
