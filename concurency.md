@@ -12,8 +12,9 @@ However this then leads to duplicate usernames being in the database, which is b
 
 
 ### Case #3: Lost Review from Deleted User
+![image](https://github.com/user-attachments/assets/331ddb5a-f295-4d19-a6f6-4a9c8ac10930)
 
-&ensp; The problem here is known as a "Phantom Read" since as someone is adding a review, Another deletes their account in the middle of adding the review. 
+&ensp; The problem here is known as a "Phantom Read" since as someone is adding a review with a username that exists, Another deletes their account in the middle of adding the review. 
 Since deleting a user also deletes all the reviews and the user adding the review passed the check to see if the user existed, The review gets added with a user that doesn't exist.
 This lead to an incorrect database as it takes reviews from users that don't exist even when they can never be accessed by anyone.
 
