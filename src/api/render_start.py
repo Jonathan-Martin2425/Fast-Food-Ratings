@@ -46,13 +46,14 @@ async def root():
 
     # gets all brands and their locations
     with db.engine.begin() as connection:
-        brands = connection.execute(sqlalchemy.text("SELECT address, name FROM brands "
+        brands = connection.execute(sqlalchemy.text("SELECT b_id, address, name FROM brands "
                                                     "JOIN locations ON b_id = brand_id"))
 
     # iterates through each location to add them to response
     for b in brands:
         brand = {
             "brand": b.name,
+            "brand_id": b.b_id,
             "addresses": []
         }
 

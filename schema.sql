@@ -99,7 +99,9 @@ VALUES (1,  '275 Madonna Rd, San Luis Obispo, CA 93401'),
 (1,  '123 Bob Dr, Tustin, CA 92780'),
 (2,  '13742 Red Hill Ave, Tustin, CA 92780'),
 (3, '866 Foothill Blvd, San Luis Obispo, CA 93405'),
-(4, '763 Foothill Blvd, San Luis Obispo, CA 93405');
+(4, '763 Foothill Blvd, San Luis Obispo, CA 93405'),
+(1, '350 5 Cities Dr, Pismo Beach, CA 93449'),
+(1, '1550 W Grand Ave, Grover Beach, CA 93433');
 
 
 INSERT INTO Hours (business_id, day_of_week, hours)
@@ -142,7 +144,14 @@ VALUES (1, 'Monday', 'Open 24 Hours'),
 INSERT INTO users (name)
 VALUES ('Anonymous'),
 ('Karen Willoughby'),
-('Randy Jr');
+('Randy Jr'),
+('Meaty Marley'),
+('Jonathan Martin'),
+('Carlos Lopez'),
+('Willeam Mendez'),
+('Justin Timberlake'),
+('The Creature'),
+('Cassidy');
 
 INSERT INTO reviews(location_id, publisher_id, 
 service_rating, quality_rating, cleanliness_rating, description)

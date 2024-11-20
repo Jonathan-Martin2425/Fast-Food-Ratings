@@ -221,5 +221,58 @@ returns a success message and adds it to the reviews of the location
 ]
 ```
 
+### 9. top_locaions - `/brands/{brand_id}/top_locations` (GET)
 
+  Gives detail on the best locations of a given brand from all reviews relates to those locations and their scores
+
+**Request**
+
+```json
+
+[]
+```
+
+**Response**
+
+```json
+
+[
+  {
+    "type": "Best Overall",
+    "Overall Score": float,
+    "Cleanliness": float,
+    "Quality": float,
+    "Service": float,
+    "address": str,
+    "location_id": int
+  },
+  {
+    "type": "Best Cleanliness",
+    "Overall Score": float,
+    "Cleanliness": float,
+    "Quality": float,
+    "Service": float,
+    "address": str,
+    "location_id": int
+  },
+  {
+    "type": "Best Quality",
+    "Overall Score": float,
+    "Cleanliness": float,
+    "Quality": float,
+    "Service": float,
+    "address": str,
+    "location_id": int
+  },
+  {
+    "type": "Best Service",
+    "Overall Score": float,
+    "Cleanliness": float,
+    "Quality": float,
+    "Service": float,
+    "address": str,
+    "location_id": int
+  }
+]
+```
 
