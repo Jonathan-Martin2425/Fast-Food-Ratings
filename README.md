@@ -1,5 +1,5 @@
 ### Fast-Food-Ratings 
-### Jonathan Martin, Carlos Lopez
+### Jonathan Martin, Willeam Mendez, Carlos Lopez
   In this project we will be creating a website where user can input and rate fast food  and their workers from 
   different types of fast food place and specific locations where they work. This will include separating different 
   types of fast food places then locations for each type and lastly all the kinds of workers in each location. 
