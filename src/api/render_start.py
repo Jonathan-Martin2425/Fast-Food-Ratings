@@ -56,7 +56,7 @@ async def root():
         raise HTTPException(status_code=503, detail="Server unable to access appropriate data")
 
     # iterates through each location to add them to response
-    brand_names = []
+    brands_dict = {}
     for b in brands:
         brand = {
             "brand": b.name,
@@ -64,17 +64,20 @@ async def root():
             "addresses": []
         }
 
-        # checks if brand already exists in response
-        # and if it doesn't, adds it
-        if b.name not in brand_names:
-            res.append(brand)
-            brand_names.append(b.name)
+        try:
+            # adds address to brand
+            brands_dict[b.name]["addresses"].append({"address": b.address,
+                                                    "address_id": b.l_id})
+        except KeyError:
+            # checks if brand already exists in response
+            # and if it doesn't, adds it
+            brands_dict[b.name] = brand
+            brands_dict[b.name]["addresses"].append({"address": b.address,
+                                                     "address_id": b.l_id})
 
-        # iterates through response to add current location/address to response
-        for cur in res:
-            if b.address not in cur["addresses"] and b.name == cur["brand"]:
-                cur["addresses"].append({"address": b.address,
-                                         "address_id": b.l_id})
+    # converts dictionary to list of dictionaries for better JSON format
+    for key in brands_dict:
+        res.append(brands_dict[key])
 
     # adds opening message to start of response
     res.insert(0, {"message": "Welcome to Fast-Food-Ratings, for all your fast food needs."})
