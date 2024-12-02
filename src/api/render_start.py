@@ -1,7 +1,7 @@
-from fastapi import FastAPI, exceptions
+from fastapi import FastAPI, exceptions, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from src.api import brands
+from src.api import brands, reviews, users
 import sqlalchemy
 from src import database as db
 import json
@@ -16,14 +16,15 @@ app = FastAPI(
     title="Fast-Food-Ratings",
     description=description,
     version="0.0.1",
-    terms_of_service="http://example.com/terms/",
     contact={
-        "name": "Lucas Pierce",
-        "email": "lupierce@calpoly.edu",
+        "name": "Jonathan Martin",
+        "email": "jmart663@calpoly.edu",
     },
 )
 
 app.include_router(brands.router)
+app.include_router(reviews.router)
+app.include_router(users.router)
 
 
 @app.exception_handler(exceptions.RequestValidationError)
@@ -45,11 +46,17 @@ async def root():
     res = []
 
     # gets all brands and their locations
-    with db.engine.begin() as connection:
-        brands = connection.execute(sqlalchemy.text("SELECT b_id, address, name FROM brands "
-                                                    "JOIN locations ON b_id = brand_id"))
+    try:
+        with db.engine.begin() as connection:
+            brands = connection.execute(sqlalchemy.text("SELECT b_id, l_id, address, name FROM brands "
+                                                        "JOIN locations ON b_id = brand_id "
+                                                        "ORDER BY name ASC, l_id ASC"))
+    except BaseException as e:
+        print(e.args[0])
+        raise HTTPException(status_code=503, detail="Server unable to access appropriate data")
 
     # iterates through each location to add them to response
+    brand_names = []
     for b in brands:
         brand = {
             "brand": b.name,
@@ -59,17 +66,15 @@ async def root():
 
         # checks if brand already exists in response
         # and if it doesn't, adds it
-        bIsThere = False
-        for cur in res:
-            if cur["brand"] == b.name:
-                bIsThere = True
-        if not bIsThere:
+        if b.name not in brand_names:
             res.append(brand)
+            brand_names.append(b.name)
 
         # iterates through response to add current location/address to response
         for cur in res:
             if b.address not in cur["addresses"] and b.name == cur["brand"]:
-                cur["addresses"].append(b.address)
+                cur["addresses"].append({"address": b.address,
+                                         "address_id": b.l_id})
 
     # adds opening message to start of response
     res.insert(0, {"message": "Welcome to Fast-Food-Ratings, for all your fast food needs."})
