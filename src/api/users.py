@@ -15,13 +15,6 @@ class Username(BaseModel):
     username: str
 
 
-class ReviewUpdate(BaseModel):
-    description: str
-    service: int
-    quality: int
-    cleanliness: int
-
-
 @router.post("/signup", status_code=201)
 def add_user(username: Username):
     actualUname = username.username.strip()

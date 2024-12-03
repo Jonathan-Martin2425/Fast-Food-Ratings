@@ -1,11 +1,11 @@
-CREATE TABLE Brands(
+CREATE TABLE brands(
   b_id int generated always as identity not null PRIMARY KEY,
   created_at timestamp with time zone null default now(),
   name text not null,
   service_type text not null
 );
 
-CREATE TABLE  Food(
+CREATE TABLE  food(
   f_id int generated always as identity not null PRIMARY KEY,
   brand_id int not null,
   FOREIGN KEY (brand_id) REFERENCES Brands(b_id),
@@ -13,14 +13,14 @@ CREATE TABLE  Food(
   name text not null
 );
 
-CREATE TABLE  Categories(
+CREATE TABLE  categories(
   food_id int not null,
   FOREIGN KEY (food_id) REFERENCES food(f_id),
   created_at timestamp with time zone null default now(),
   category text not null
 );
 
-CREATE TABLE  Locations(
+CREATE TABLE  locations(
   l_id int generated always as identity not null PRIMARY KEY,
   brand_id int not null,
   FOREIGN KEY (brand_id) REFERENCES Brands(b_id),
@@ -28,22 +28,25 @@ CREATE TABLE  Locations(
   address text not null
 );
 
-CREATE TABLE Hours(
+CREATE TYPE dayofweek AS ENUM ('sad', 'ok', 'happy');
+
+CREATE TABLE hours(
   id int generated always as identity not null PRIMARY KEY,
   created_at timestamp with time zone null default now(),
-  business_id int not null,
-  FOREIGN KEY (business_id) REFERENCES locations(l_id),
-  day_of_week text not null,
-  hours text not null
+  location_id int not null,
+  FOREIGN KEY (location_id) REFERENCES locations(l_id),
+  day_name day_of_week not null,
+  open_time time DEFAULT '00:00:00',
+  close_time time DEFAULT '24:00:00'
 );
 
-CREATE TABLE Users(
+CREATE TABLE users(
   u_id int generated always as identity not null PRIMARY KEY,
   created_at timestamp with time zone null default now(),
   name text not null
 );
 
-CREATE TABLE  Reviews(
+CREATE TABLE  reviews(
   r_id int generated always as identity not null PRIMARY KEY,
   location_id int not null,
   FOREIGN KEY (location_id) REFERENCES Locations(l_id),
@@ -55,17 +58,17 @@ CREATE TABLE  Reviews(
   description text not null
 );
 
-CREATE TABLE visited(
+CREATE TABLE user_visits(
   v_id int generated always as identity not null PRIMARY KEY,
   created_at timestamp with time zone null default now(),
   user_id int not null,
   FOREIGN KEY (user_id) REFERENCES users(u_id),
-  visit text not null
+  FOREIGN KEY (location_id) REFERENCES locations(l_id),
 );
 
 
 -- This is where a set of default values will be initialized
--- like McDonalds and the location on maddona rd
+-- like McDonalds and the on maddona rd
 -- every table has at least 1 starting value, including reviews
 
 INSERT INTO brands (name, service_type)
@@ -104,42 +107,42 @@ VALUES (1,  '275 Madonna Rd, San Luis Obispo, CA 93401'),
 (1, '1550 W Grand Ave, Grover Beach, CA 93433');
 
 
-INSERT INTO Hours (business_id, day_of_week, hours)
-VALUES (1, 'Monday', 'Open 24 Hours'),
-(1, 'Tuesday', 'Open 24 Hours'),
-(1, 'Wednesday', 'Open 24 Hours'),
-(1, 'Thursday', 'Open 24 Hours'),
-(1, 'Friday', 'Open 24 Hours'),
-(1, 'Saturday', 'Open 24 Hours'),
-(1, 'Sunday', 'Open 24 Hours'),
-(2, 'Monday', '7am-10pm'),
-(2, 'Tuesday', '7am-10pm'),
-(2, 'Wednesday', '7am-10pm'),
-(2, 'Thursday', '7am-10pm'),
-(2, 'Friday', '7am-12am'),
-(2, 'Saturday', '8am-2am'),
-(2, 'Sunday', '8am-10pm'),
-(3, 'Monday', 'Open 24 Hours'),
-(3, 'Tuesday', 'Open 24 Hours'),
-(3, 'Wednesday', 'Open 24 Hours'),
-(3, 'Thursday', 'Open 24 Hours'),
-(3, 'Friday', 'Open 24 Hours'),
-(3, 'Saturday', 'Open 24 Hours'),
-(3, 'Sunday', 'Open 24 Hours'),
-(4, 'Monday', '11am-2am'),
-(4, 'Tuesday', '11am-2am'),
-(4, 'Wednesday', '11am-2am'),
-(4, 'Thursday', '11am-2am'),
-(4, 'Friday', '11am-2am'),
-(4, 'Saturday', '11am-2am'),
-(4, 'Sunday', '11am-2am'),
-(5, 'Monday', '11am-10pm'),
-(5, 'Tuesday', '11am-10pm'),
-(5, 'Wednesday', '11am-10pm'),
-(5, 'Thursday', '11am-10pm'),
-(5, 'Friday', '11am-10pm'),
-(5, 'Saturday', '11am-10pm'),
-(5, 'Sunday', '11am-10pm');
+INSERT INTO hours (business_id, day_of_week, open_time, close_time)
+VALUES (1, 'Monday', '00:00:00', '24:00:00'),
+(1, 'Tuesday', '00:00:00', '24:00:00'),
+(1, 'Wednesday', '00:00:00', '24:00:00'),
+(1, 'Thursday', '00:00:00', '24:00:00'),
+(1, 'Friday', '00:00:00', '24:00:00'),
+(1, 'Saturday', '00:00:00', '24:00:00'),
+(1, 'Sunday', '00:00:00', '24:00:00'),
+(2, 'Monday', '07:00:00', '22:00:00'),
+(2, 'Tuesday', '07:00:00', '22:00:00'),
+(2, 'Wednesday', '07:00:00', '22:00:00'),
+(2, 'Thursday', '07:00:00', '22:00:00'),
+(2, 'Friday', '07:00:00', '24:00:00'),
+(2, 'Saturday', '08:00:00', '02:00:00'),
+(2, 'Sunday', '08:00:00', '22:00:00'),
+(3, 'Monday', '00:00:00', '24:00:00'),
+(3, 'Tuesday', '00:00:00', '24:00:00'),
+(3, 'Wednesday', '00:00:00', '24:00:00'),
+(3, 'Thursday', '00:00:00', '24:00:00'),
+(3, 'Friday', '00:00:00', '24:00:00'),
+(3, 'Saturday', '00:00:00', '24:00:00'),
+(3, 'Sunday', '00:00:00', '24:00:00'),
+(4, 'Monday', '11:00:00', '02:00:00'),
+(4, 'Tuesday', '11:00:00', '02:00:00'),
+(4, 'Wednesday', '11:00:00', '02:00:00'),
+(4, 'Thursday', '11:00:00', '02:00:00'),
+(4, 'Friday', '11:00:00', '02:00:00'),
+(4, 'Saturday', '11:00:00', '02:00:00'),
+(4, 'Sunday', '11:00:00', '02:00:00'),
+(5, 'Monday', '11:00:00', '22:00:00'),
+(5, 'Tuesday', '11:00:00', '22:00:00'),
+(5, 'Wednesday', '11:00:00', '22:00:00'),
+(5, 'Thursday', '11:00:00', '22:00:00'),
+(5, 'Friday', '11:00:00', '22:00:00'),
+(5, 'Saturday', '11:00:00', '22:00:00'),
+(5, 'Sunday', '11:00:00', '22:00:00');
 
 INSERT INTO users (name)
 VALUES ('Anonymous'),

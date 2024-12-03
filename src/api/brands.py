@@ -11,27 +11,44 @@ router = APIRouter(
 )
 
 
-# given a brand id, returns all its locations
-# if there are no locations or brand doesn't exist, raises 400 error with message
-@router.get("/{brand_id}/")
-def get_locations(brand_id: int):
+# shows all brands with their locations
+@router.get("/")
+def get_brands():
     res = []
-    with db.engine.begin() as connection:
-        locations = connection.execute(
-            sqlalchemy.text("SELECT name, l_id, address, b_id FROM brands "
-                            "JOIN locations ON b_id = brand_id "
-                            "WHERE brand_id = :brand"), {"brand": brand_id})
-        for location in locations:
-            res.append({
-                "address": location.address,
-                "address_id": location.l_id,
-                "brand": location.name,
-                "brand_id": location.b_id
-            })
 
-    if not res:
-        # raises bad input error on incorrect location or brand id
-        raise HTTPException(status_code=400, detail="There is no such brand")
+    # gets all brands and their locations
+    try:
+        with db.engine.begin() as connection:
+            brands = connection.execute(sqlalchemy.text("SELECT b_id, l_id, address, name FROM brands "
+                                                        "JOIN locations ON b_id = brand_id "
+                                                        "ORDER BY name ASC, l_id ASC"))
+    except BaseException as e:
+        print(e.args[0])
+        raise HTTPException(status_code=503, detail="Server unable to access appropriate data")
+
+    # iterates through each location to add them to response
+    brands_dict = {}
+    for b in brands:
+        brand = {
+            "brand": b.name,
+            "brand_id": b.b_id,
+            "addresses": []
+        }
+
+        try:
+            # adds address to brand
+            brands_dict[b.name]["addresses"].append({"address": b.address,
+                                                     "address_id": b.l_id})
+        except KeyError:
+            # checks if brand already exists in response
+            # and if it doesn't, adds it
+            brands_dict[b.name] = brand
+            brands_dict[b.name]["addresses"].append({"address": b.address,
+                                                     "address_id": b.l_id})
+
+    # converts dictionary to list of dictionaries for better JSON format
+    for key in brands_dict:
+        res.append(brands_dict[key])
 
     return res
 
