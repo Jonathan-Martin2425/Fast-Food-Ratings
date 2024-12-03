@@ -41,8 +41,16 @@ def get_brand_ingredients(brand_id: int):
                                                         WHERE food.brand_id = :brand_id
                                                         ORDER BY name asc"""), {"brand_id": brand_id})
         brand = connection.execute(sqlalchemy.text("SELECT name FROM brands WHERE b_id = :brand_id"), {"brand_id": brand_id}).scalar()
-        for i in ingredients:
-            print(i)
+    for i in ingredients:
+        all.append({
+            "brand_id": brand_id,
+            "brand_name": brand,
+            "ingredient": i[0]
+        })
+    if len(all) == 0:
+        raise HTTPException(status_code=400, detail="There are no ingredients for that brand_id")
+    return all
+    
         
         
         
