@@ -12,6 +12,8 @@ router = APIRouter(
 
 
 class Review(BaseModel):
+    brand_id: int
+    location_id: int
     publisher_id: int
     description: str
     service: int
@@ -26,23 +28,24 @@ class ReviewUpdate(BaseModel):
     cleanliness: int
 
 
+class ReviewAuth(BaseModel):
+    username: str
+    r_id: int
+
+
 # Given a correct location with its brand id, returns them and all reviews from that location
 # if the brand or location ids are incorrect, then it gives an error message
-@router.get("/{brand_id}/location/{location_id}")
-def get_reviews(brand_id: int, location_id: int):
+@router.get("{location_id}")
+def get_reviews(location_id: int):
     res = []
     with db.engine.begin() as connection:
 
         # gets brand name and address, also checking if they exist
-        location_data = {
-            "brand": brand_id,
-            "location": location_id
-        }
         try:
-            brand, address = connection.execute(
-                sqlalchemy.text("SELECT name, address FROM brands "
+            location_data = connection.execute(
+                sqlalchemy.text("SELECT name, address, b_id FROM brands "
                                 "JOIN locations ON b_id = brand_id "
-                                "WHERE brand_id = :brand AND l_id = :location"), location_data).one()
+                                "WHERE l_id = :location"), {"location": location_id}).one()
         except sqlalchemy.exc.NoResultFound:
 
             # raises bad input error on incorrect location or brand id
@@ -50,9 +53,9 @@ def get_reviews(brand_id: int, location_id: int):
 
         # adds brand name and address to top of response
         res.append({
-            "brand": brand,
-            "brand_id": brand_id,
-            "address": address,
+            "brand": location_data.name,
+            "brand_id": location_data.b_id,
+            "address": location_data.address,
             "address_id": location_id,
         })
 
@@ -62,7 +65,7 @@ def get_reviews(brand_id: int, location_id: int):
             "service_rating, quality_rating, cleanliness_rating, description, r_id FROM reviews "
             "JOIN users ON publisher_id = u_id "
             "WHERE location_id = :location "
-            "ORDER BY date_published ASC"), location_data)
+            "ORDER BY date_published ASC"), {"location": location_id})
 
         # iterates through reviews and adds each one to response
         for review in reviews:
@@ -81,8 +84,8 @@ def get_reviews(brand_id: int, location_id: int):
 
 
 # adds a review given all the known parameters
-@router.post("/{brand_id}/location/{location_id}", status_code=201)
-def submit_review(review: Review, brand_id: int, location_id: int):
+@router.post("/", status_code=201)
+def submit_review(review: Review):
     with db.engine.begin() as connection:
 
         # checks if review attributes are valid
@@ -99,8 +102,8 @@ def submit_review(review: Review, brand_id: int, location_id: int):
                                       {"id": review.publisher_id}).one().name
 
         # gets brand name and address/location_name from ids
-        brand_dict = {"location": location_id,
-                      "brand": brand_id}
+        brand_dict = {"location": review.location_id,
+                      "brand": review.brand_id}
         try:
             brand_name, address = connection.execute(
                 sqlalchemy.text("SELECT name, address FROM brands "
@@ -113,7 +116,7 @@ def submit_review(review: Review, brand_id: int, location_id: int):
 
         # adds review to reviews table
         review_data = {
-            "l_id": location_id,
+            "l_id": review.location_id,
             "p_id": review.publisher_id,
             "description": review.description,
             "service_rating": review.service,
@@ -127,8 +130,11 @@ def submit_review(review: Review, brand_id: int, location_id: int):
                                                   ":quality_rating, :cleanliness_rating) "
                                                   "RETURNING r_id"), review_data).one().r_id
 
-        connection.execute(sqlalchemy.text("INSERT INTO visited (user_id, visit) "
-                                           "VALUES (:p_id, :location)"), review_data)
+        connection.execute(sqlalchemy.text("INSERT INTO user_visits (user_id, location_id) "
+                                           "VALUES (:p_id, :l_id)"), {
+            "p_id": review.publisher_id,
+            "l_id": review.location_id
+        })
 
         # returns review made to user
         res = [{
@@ -142,14 +148,14 @@ def submit_review(review: Review, brand_id: int, location_id: int):
     return res
 
 
-@router.delete("{username}/review/{r_id}")
-def delete_review(username: str, r_id: int):
+@router.delete("/")
+def delete_review(authentication: ReviewAuth):
     with db.engine.begin() as connection:
 
         # checks if review or user exists and gives 400 error if it doesn't
         review_dict = {
-            "r_id": r_id,
-            "name": username
+            "r_id": authentication.r_id,
+            "name": authentication.username
         }
         review = connection.execute(sqlalchemy.text("SELECT u_id FROM users "
                                                     "JOIN reviews ON publisher_id = u_id "
@@ -167,7 +173,7 @@ def delete_review(username: str, r_id: int):
     return []
 
 
-@router.patch("{username}/review/{r_id}")
+@router.patch("/{r_id}/user/{username}")
 def update_review(username: str, r_id: int, newReview: ReviewUpdate):
     # checks if newReview has valid inputs
     if newReview.description is None or newReview.service > 10 or newReview.service < 0 or \
@@ -181,14 +187,14 @@ def update_review(username: str, r_id: int, newReview: ReviewUpdate):
             "r_id": r_id,
             "name": username
         }
-        review = connection.execute(sqlalchemy.text("SELECT u_id, address FROM users "
+        review = connection.execute(sqlalchemy.text("SELECT u_id, l_id FROM users "
                                                     "JOIN reviews ON publisher_id = u_id "
                                                     "LEFT JOIN locations ON location_id = l_id "
                                                     "WHERE r_id= :r_id AND name = :name"), review_ids)
         i = 0
         for r in review:
             review_ids["u_id"] = r.u_id
-            review_ids["location"] = r.address
+            review_ids["l_id"] = r.l_id
             i += 1
         if i < 1:
             raise HTTPException(status_code=400, detail="review or user does not exist.")
@@ -200,12 +206,12 @@ def update_review(username: str, r_id: int, newReview: ReviewUpdate):
             "q_rating": newReview.quality,
             "c_rating": newReview.cleanliness,
             "u_id": review_ids["u_id"],
-            "r_id": r_id
+            "r_id": r_id,
         }
         connection.execute(sqlalchemy.text("UPDATE reviews "
                                            "SET description = :description, service_rating = :s_rating, "
                                            "quality_rating = :q_rating, cleanliness_rating = :c_rating "
                                            "WHERE publisher_id = :u_id AND r_id = :r_id"), review_dict)
-        connection.execute(sqlalchemy.text("INSERT INTO visited (user_id, visit) "
-                                           "VALUES (:u_id, :location)"), review_ids)
+        connection.execute(sqlalchemy.text("INSERT INTO user_visits (user_id, location_id) "
+                                           "VALUES (:u_id, :l_id)"), review_ids)
     return review_dict
