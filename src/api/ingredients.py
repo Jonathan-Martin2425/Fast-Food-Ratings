@@ -16,6 +16,7 @@ class Ingredient(BaseModel):
     food_id: int
     name: str
     
+# gets all of the ingredients in the ingredients database
 @router.get("/")
 def get_ingredients():
     all = []
@@ -28,6 +29,25 @@ def get_ingredients():
             "name": ingredient.name
         })
     return all
+
+# gets all the ingredients that a specific brand uses in all of their foods
+@router.get("/{brand_id}/all_ingredients")
+def get_brand_ingredients(brand_id: int):
+    all = []
+    with db.engine.begin() as connection:
+        ingredients = connection.execute(sqlalchemy.text("""SELECT ingredients.name FROM ingredients
+                                                        JOIN food ON food.f_id = ingredients.food_id
+                                                        JOIN brands on food.brand_id = brands.b_id
+                                                        WHERE food.brand_id = :brand_id
+                                                        ORDER BY name asc"""), {"brand_id": brand_id})
+        brand = connection.execute(sqlalchemy.text("SELECT name FROM brands WHERE b_id = :brand_id"), {"brand_id": brand_id}).scalar()
+        for i in ingredients:
+            print(i)
+        
+        
+        
+        
+            
 
     
     
