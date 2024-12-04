@@ -89,24 +89,41 @@ def get_user_reviews(username: str):
     return res
 
 
-@router.delete(("/"))
-def delete_user(username: Username):
-    if username.username.strip() == "Anonymous":
+@router.delete("/")
+def delete_user(user: UserDelete):
+    username = user.username.strip()
+    password = user.password.strip()
+
+    # Prevent deletion of the 'Anonymous' user
+    if username == "Anonymous":
         raise HTTPException(status_code=405, detail="Can't delete 'Anonymous' user and their reviews")
 
     with db.engine.begin() as connection:
-        t = connection.execute(sqlalchemy.text("SELECT name, r_id FROM users "
-                                               "JOIN reviews ON u_id = publisher_id "
-                                               "WHERE :name = name"), {"name": username.username})
+        # Retrieve user details
+        user_record = connection.execute(
+            sqlalchemy.text("SELECT u_id, password FROM users WHERE name = :name"),
+            {"name": username}
+        ).fetchone()
 
-        reviews = []
-        for r in t:
-            reviews.append({
-                "id": r.r_id
-            })
+        if not user_record:
+            raise HTTPException(status_code=404, detail="User does not exist")
 
-        if len(reviews) > 0:
-            connection.execute(sqlalchemy.text("DELETE FROM reviews WHERE :id = r_id"), reviews)
-            connection.execute(sqlalchemy.text("DELETE FROM visited WHERE :id = user_id"), username.username)
-        connection.execute(sqlalchemy.text("DELETE FROM users WHERE :name = name"), {"name": username.username})
-    return []
+        # Verify the password
+        stored_password = user_record.password
+        if password != stored_password:
+            raise HTTPException(status_code=403, detail="Incorrect password")
+
+        # Delete reviews, visited records, and the user
+        connection.execute(
+            sqlalchemy.text("DELETE FROM reviews WHERE publisher_id = :user_id"),
+            {"user_id": user_record.u_id}
+        )
+        connection.execute(
+            sqlalchemy.text("DELETE FROM user_visits WHERE user_id = :user_id"),
+            {"user_id": user_record.u_id}
+        )
+        connection.execute(
+            sqlalchemy.text("DELETE FROM users WHERE u_id = :user_id"),
+            {"user_id": user_record.u_id}
+        )
+    return {"message": f"User '{username}' and their associated data have been deleted successfully"}
