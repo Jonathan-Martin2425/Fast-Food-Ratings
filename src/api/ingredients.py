@@ -32,24 +32,36 @@ def get_ingredients():
 
 # gets all the ingredients of a specific brand
 @router.get("/{brand_id}/all_ingredients")
+@router.get("/{brand_id}/all_ingredients")
 def get_brand_ingredients(brand_id: int):
-    all_ing = []
     with db.engine.begin() as connection:
-        ingredients = connection.execute(sqlalchemy.text("""SELECT ingredients.name FROM ingredients
-                                                        JOIN food ON food.f_id = ingredients.food_id
-                                                        JOIN brands on food.brand_id = brands.b_id
-                                                        WHERE food.brand_id = :brand_id
-                                                        ORDER BY name asc"""), {"brand_id": brand_id})
-        brand = connection.execute(sqlalchemy.text("SELECT name FROM brands WHERE b_id = :brand_id"), {"brand_id": brand_id}).scalar()
-    for i in ingredients:
-        all_ing.append({
-            "brand_id": brand_id,
-            "brand_name": brand,
-            "ingredient": i[0]
-        })
-    if len(all_ing) == 0:
-        raise HTTPException(status_code=400, detail=f"There are no ingredients for that brand_id#{brand_id} or that brand_id does not exist")
-    return all_ing
+        ingredients = connection.execute(
+            sqlalchemy.text("""
+                SELECT DISTINCT ingredients.name FROM ingredients
+                JOIN food ON food.f_id = ingredients.food_id
+                JOIN brands ON food.brand_id = brands.b_id
+                WHERE food.brand_id = :brand_id
+                ORDER BY ingredients.name ASC
+            """),
+            {"brand_id": brand_id}
+        ).fetchall()
+
+        brand = connection.execute(
+            sqlalchemy.text("SELECT name FROM brands WHERE b_id = :brand_id"),
+            {"brand_id": brand_id}
+        ).scalar()
+
+    if not brand or not ingredients:
+        raise HTTPException(
+            status_code=400,
+            detail=f"There are no ingredients for brand_id #{brand_id} or that brand_id does not exist"
+        )
+    return {
+        "brand_id": brand_id,
+        "brand_name": brand,
+        "ingredients": [i[0] for i in ingredients]
+    }
+
 
 
 # gets all the ingredients of a specific food
