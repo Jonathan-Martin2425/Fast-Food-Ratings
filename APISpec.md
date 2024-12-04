@@ -279,3 +279,28 @@
   "ingredients": ["string", "string"]
 }
 ```
+
+## 5. Recommendations
+
+### 5.1. Get Recommended Resturaants - `/recommendations/{username}` (GET)
+
+  Recommends restaurants to a user based on their review history.
+
+**Request**
+
+```json
+{
+  "username": "string"
+}
+```
+
+**Response**
+
+```json
+{
+  "location_id": "integer",
+  "address": "string",
+  "brand_name": "string"
+}
+```
+
