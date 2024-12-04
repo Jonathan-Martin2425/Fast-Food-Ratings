@@ -13,25 +13,44 @@ router = APIRouter(
 
 class Username(BaseModel):
     username: str
+    
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+class UserDelete(BaseModel):
+    username: str
+    password: str
 
 
 @router.post("/signup", status_code=201)
-def add_user(username: Username):
-    actualUname = username.username.strip()
+def add_user(user: UserCreate):
+    actualUname = user.username.strip()
+    password = user.password.strip()
+
+    # Validate username and password length
     if len(actualUname) >= 30:
-        raise HTTPException(status_code=400, detail="name too long, max 30 characters")
+        raise HTTPException(status_code=400, detail="Username too long, max 30 characters")
     elif len(actualUname) <= 4:
-        raise HTTPException(status_code=400, detail="name too small, min 4 characters")
+        raise HTTPException(status_code=400, detail="Username too short, min 4 characters")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Password too short, min 6 characters")
+
     with db.engine.begin() as connection:
+        # Check if username already exists
         t = connection.execute(sqlalchemy.text("SELECT name FROM users"))
         for name in t:
             if name.name == actualUname:
                 raise HTTPException(status_code=400, detail="Username already exists")
-        u_id = connection.execute(sqlalchemy.text("INSERT INTO users (name) VALUES"
-                                                  "(:name) RETURNING u_id"), {"name": actualUname}).scalar()
-        return [{
-            "id": u_id
-        }]
+
+        # Insert the new user with username and plain password
+        u_id = connection.execute(
+            sqlalchemy.text(
+                "INSERT INTO users (name, password) VALUES (:name, :password) RETURNING u_id"
+            ),
+            {"name": actualUname, "password": password},
+        ).scalar()
+        return {"id": u_id}
 
 
 @router.get("/")
