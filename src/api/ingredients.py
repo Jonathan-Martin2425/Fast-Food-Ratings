@@ -30,10 +30,10 @@ def get_ingredients():
         })
     return all
 
-# gets all the ingredients that a specific brand uses in all of their foods
+# gets all the ingredients of a specific brand
 @router.get("/{brand_id}/all_ingredients")
 def get_brand_ingredients(brand_id: int):
-    all = []
+    all_ing = []
     with db.engine.begin() as connection:
         ingredients = connection.execute(sqlalchemy.text("""SELECT ingredients.name FROM ingredients
                                                         JOIN food ON food.f_id = ingredients.food_id
@@ -42,14 +42,50 @@ def get_brand_ingredients(brand_id: int):
                                                         ORDER BY name asc"""), {"brand_id": brand_id})
         brand = connection.execute(sqlalchemy.text("SELECT name FROM brands WHERE b_id = :brand_id"), {"brand_id": brand_id}).scalar()
     for i in ingredients:
-        all.append({
+        all_ing.append({
             "brand_id": brand_id,
             "brand_name": brand,
             "ingredient": i[0]
         })
-    if len(all) == 0:
-        raise HTTPException(status_code=400, detail="There are no ingredients for that brand_id")
-    return all
+    if len(all_ing) == 0:
+        raise HTTPException(status_code=400, detail=f"There are no ingredients for that brand_id#{brand_id} or that brand_id does not exist")
+    return all_ing
+
+
+# gets all the ingredients of a specific food
+@router.get("/{food_id}")
+def get_food_ingredients(food_id: int):
+    with db.engine.begin() as connection:
+        ingredients = connection.execute(
+            sqlalchemy.text("""
+                SELECT ingredients.name FROM ingredients
+                JOIN food ON food.f_id = ingredients.food_id
+                WHERE food.f_id = :food_id
+                ORDER BY name ASC
+            """),
+            {"food_id": food_id}
+        ).fetchall()
+
+        food = connection.execute(
+            sqlalchemy.text("SELECT name FROM food WHERE f_id = :food_id"),
+            {"food_id": food_id}
+        ).scalar()
+
+    if not food or not ingredients:
+        raise HTTPException(
+            status_code=400,
+            detail=f"There are no ingredients for food_id #{food_id} or that food_id does not exist"
+        )
+
+    return {
+        "food_id": food_id,
+        "food": food,
+        "ingredients": [i[0] for i in ingredients]
+    }
+
+
+
+
     
         
         
