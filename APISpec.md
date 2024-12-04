@@ -1,278 +1,281 @@
-### 1. Get Root - `/` (GET)
 
-  Loads the front page of the website, which will include a list of
-All fast food places available to rate with better formatting and
-buttons to lead to their different locations
+## 1. User Management
+
+### 1.1. Get Users - `/users/` (GET)
+
+  Retrieves a list of all users.
 
 **Response**
 
 ```json
-
 [
   {
-    "fast food": "string",
-    "...": "..."
+    "name": "string",
+    "id": "integer"
   },
-
-  {"...": "..."},
-
   {
-    "fast food": "string"
-    "...": "..."
+    "name": "string",
+    "id": "integer"
   }
 ]
 ```
 
-### 2. Get Fast Food Place - `/{fast_food_place}` (GET)
+### 1.2. Get User Reviews - `/users/{username}` (GET)
 
-  Given the name of a fast_food_place, like "KFC" or "Taco_Bell", returns
-the page for that specific place, the details of different locations leading to their page
-and ratings of specific foods shared between locations.
+  Retrieves all reviews written by a specific user.
 
 **Response**
 
 ```json
 [
   {
-    "location_id": "int"
-    "address": "string"
-    "...": "..."
+    "publisher": "string",
+    "description": "string",
+    "ratings (S, Q, C)": [integer, integer, integer],
+    "date_published": "string",
+    "publisher_id": "integer"
   },
-
-  {"...": "..."},
-
   {
-    "location_id": "int"
-    "address": "string"
-    "...": "..."
+    "publisher": "string",
+    "description": "string",
+    "ratings (S, Q, C)": [integer, integer, integer],
+    "date_published": "string",
+    "publisher_id": "integer"
   }
 ]
 ```
 
-### 3. Get Location - `{fast_food_place}/location/{location_id}` (GET)
+### 1.3. Create User - `/users/signup` (POST)
 
-  Given a correct fast_food_place and location_id returns the list of interviews
-related to that location and an area to write a review with a button to submit
+  Adds a new user to the database.
+
+**Request**
+
+```json
+{
+  "username": "string",
+  "password": "string"
+}
+```
 
 **Response**
 
 ```json
+{
+  "id": "integer"
+}
+```
 
+### 1.4. Delete User - `/users/` (DELETE)
+
+  Deletes a user and their associated data.
+
+**Request**
+
+```json
+{
+  "username": "string",
+  "password": "string"
+}
+```
+
+**Response**
+
+```json
+{
+  "message": "string"
+}
+```
+## 2. Reviews
+
+### 2.1. Get Reviews by Location - `/reviews/{location_id}` (GET)
+
+  Retrieves all reviews for a specific location.
+
+**Response**
+
+```json
 [
   {
-    "interview_id": "int"
-    "review_text": "string"
-    "food_ratings": "List"
-    "...": "..."
+    "brand": "string",
+    "brand_id": "integer",
+    "address": "string",
+    "address_id": "integer"
   },
-
-  {"...": "..."},
-
   {
-    "interview_id": "int"
-    "review_text": "string"
-    "food_ratings": "List"
-    "...": "..."
+    "description": "string",
+    "ratings (S, Q, C)": [integer, integer, integer],
+    "date_published": "string",
+    "publisher": "string",
+    "publisher_id": "integer",
+    "review_id": "integer"
   }
 ]
 ```
 
-### 4. Submit Review - `{fast_food_place}/location/{location_id}` (POST)
+### 2.2. Submit Review - `/reviews/` (POST)
 
-  given a correctly formatted JSON request from the given review UI
-returns a success message and adds it to the reviews of the location
+  Adds a new review for a specific location.
 
 **Request**
 
 ```json
-
-[
-  {
-    "interview_id": "int"
-    "review_text": "string"
-    "food_ratings": "List"
-    "...": "..."
-  }
-]
+{
+  "brand_id": "integer",
+  "location_id": "integer",
+  "publisher_id": "integer",
+  "description": "string",
+  "service": "integer",
+  "quality": "integer",
+  "cleanliness": "integer"
+}
 ```
 
 **Response**
 
 ```json
-
 [
   {
-    "response": "string"
+    "publisher": "string",
+    "brand": "string",
+    "address": "string",
+    "description": "string",
+    "ratings (Service, Quality, Cleanliness)": [integer, integer, integer],
+    "r_id": "integer"
   }
 ]
 ```
 
-### 5. Handling - `{fast_food_place}/location/{location_id}` (GET)
+### 2.3. Delete Review - `/reviews/` (DELETE)
 
-  Given wrong fast_food_place or location_id we would have catch statements to compensate for some oversight. This will also help us improve the user experience if we see this happening a lot on our end.
+  Deletes a specific review by ID and username.
 
 **Request**
 
 ```json
-
-[
-  {
-    "location": "string"
-    "location_id": "integer"
-  }
-]
+{
+  "username": "string",
+  "r_id": "integer"
+}
 ```
 
 **Response**
 
 ```json
-
-[
-  {
-    "response": "string"
-    "error_message": "boolean"
-  }
-]
-```
-
-### 6. Recommendations - `{location_id}/recommend/` (GET)
-
-  Person accessing our website will be able to see our recommendations for them based on their information and passed searches.
-
-**Request**
-
-```json
-
-[
-  {
-    "location": "string"
-    "reviews": "string"
-    "prices": "number"
-    "quality": "string"
-  }
-]
-```
-
-**Response**
-
-```json
-
-[
-  {
-    "recommend": "string"
-    "stats": "integer"
-  }
-]
-```
-
-### 7. Update to see new reviews - `{fast_food_place}/updates/qualities` (GET)
-
-  Update the information shown on the website live to allow our users to have the most up to date and relevant ratings. This will help with their last minute decision making if they spot interesting reviews.
-
-**Request**
-
-```json
-
-[
-  {
-    "live_input": "string"
-    "reviews": "string"
-    "time": "number"
-  }
-]
-```
-
-**Response**
-
-```json
-
-[
-  {
-    "Something": "string"
-  }
-]
-```
-
-### 8. Notifications - `{fast_food_place}/users/person` (GET)
-
-  Send notifications to all of our users on our website to let them know of changes. A person may have interacted with their posting or we are just saying hello to encourage engagement.
-
-**Request**
-
-```json
-
-[
-  {
-    "posting": "string"
-    "deals": "string"
-    "prices": "integer"
-  }
-]
-```
-
-**Response**
-
-```json
-
-[
-  {
-    "notification": "string"
-  }
-]
-```
-
-### 9. top_locaions - `/brands/{brand_id}/top_locations` (GET)
-
-  Gives detail on the best locations of a given brand from all reviews relates to those locations and their scores
-
-**Request**
-
-```json
-
 []
 ```
 
+### 2.4. Update Review - `/reviews/{r_id}/user/{username}` (PATCH)
+
+  Updates a specific review's details.
+
+**Request**
+
+```json
+{
+  "description": "string",
+  "service": "integer",
+  "quality": "integer",
+  "cleanliness": "integer"
+}
+```
+
 **Response**
 
 ```json
+{
+  "description": "string",
+  "s_rating": "integer",
+  "q_rating": "integer",
+  "c_rating": "integer",
+  "u_id": "integer",
+  "r_id": "integer"
+}
+```
+## 3. Brands
 
+### 3.1. Get All Brands - `/brands/` (GET)
+
+  Retrieves all brands with their locations.
+
+**Response**
+
+```json
 [
   {
-    "type": "Best Overall",
-    "Overall Score": float,
-    "Cleanliness": float,
-    "Quality": float,
-    "Service": float,
-    "address": str,
-    "location_id": int
-  },
-  {
-    "type": "Best Cleanliness",
-    "Overall Score": float,
-    "Cleanliness": float,
-    "Quality": float,
-    "Service": float,
-    "address": str,
-    "location_id": int
-  },
-  {
-    "type": "Best Quality",
-    "Overall Score": float,
-    "Cleanliness": float,
-    "Quality": float,
-    "Service": float,
-    "address": str,
-    "location_id": int
-  },
-  {
-    "type": "Best Service",
-    "Overall Score": float,
-    "Cleanliness": float,
-    "Quality": float,
-    "Service": float,
-    "address": str,
-    "location_id": int
+    "brand": "string",
+    "brand_id": "integer",
+    "addresses": [
+      {
+        "address": "string",
+        "address_id": "integer"
+      }
+    ]
   }
 ]
 ```
 
+### 3.2. Get Top Locations - `/brands/{brand_id}/top_locations` (GET)
+
+  Retrieves the top-rated locations for a specific brand.
+
+**Response**
+
+```json
+[
+  {
+    "type": "Best Overall",
+    "Overall Score": "float",
+    "Cleanliness": "float",
+    "Quality": "float",
+    "Service": "float",
+    "address": "string",
+    "location_id": "integer",
+    "brand_id": "integer"
+  }
+]
+```
+## 4. Ingredients
+
+### 4.1. Get All Ingredients - `/ingredients/` (GET)
+
+  Retrieves a list of all ingredients.
+
+**Response**
+
+```json
+[
+  {
+    "id": "integer",
+    "name": "string"
+  }
+]
+```
+
+### 4.2. Get Brand Ingredients - `/ingredients/{brand_id}/all_ingredients` (GET)
+
+  Retrieves all ingredients for a specific brand.
+
+**Response**
+
+```json
+{
+  "brand_id": "integer",
+  "brand_name": "string",
+  "ingredients": ["string", "string"]
+}
+```
+
+### 4.3. Get Food Ingredients - `/ingredients/{food_id}` (GET)
+
+  Retrieves all ingredients for a specific food item.
+
+**Response**
+
+```json
+{
+  "food_id": "integer",
+  "food": "string",
+  "ingredients": ["string", "string"]
+}
+```
