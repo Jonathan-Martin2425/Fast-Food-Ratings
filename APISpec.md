@@ -31,14 +31,14 @@
   {
     "publisher": "string",
     "description": "string",
-    "ratings (S, Q, C)": [integer, integer, integer],
+    "ratings (S, Q, C)": ["integer", "integer", "integer"],
     "date_published": "string",
     "publisher_id": "integer"
   },
   {
     "publisher": "string",
     "description": "string",
-    "ratings (S, Q, C)": [integer, integer, integer],
+    "ratings (S, Q, C)": ["integer", "integer", "integer"],
     "date_published": "string",
     "publisher_id": "integer"
   }
@@ -104,7 +104,7 @@
   },
   {
     "description": "string",
-    "ratings (S, Q, C)": [integer, integer, integer],
+    "ratings (S, Q, C)": ["integer", "integer", "integer"],
     "date_published": "string",
     "publisher": "string",
     "publisher_id": "integer",
@@ -140,7 +140,7 @@
     "brand": "string",
     "address": "string",
     "description": "string",
-    "ratings (Service, Quality, Cleanliness)": [integer, integer, integer],
+    "ratings (Service, Quality, Cleanliness)": ["integer", "integer", "integer"],
     "r_id": "integer"
   }
 ]
