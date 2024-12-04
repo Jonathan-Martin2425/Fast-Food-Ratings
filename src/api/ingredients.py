@@ -94,6 +94,8 @@ def get_food_ingredients(food_id: int):
         "food": food,
         "ingredients": [i[0] for i in ingredients]
     }
+    
+    
 
 
 
