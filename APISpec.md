@@ -280,6 +280,24 @@
 }
 ```
 
+### 4.4. Analyze Ingredient Impact - `/ingredients/{ingredient_id}/impact_on_reviews` (GET)
+
+Fetches average ratings for locations that use and don't use a specific ingredient.
+
+**Response:**
+
+```json
+{
+  "ingredient_id": 5,
+  "locations_with_ingredient": [
+    {"location_id": 1, "brand_name": "Burger King", "address": "123 Main St"},
+    {"location_id": 2, "brand_name": "McDonald's", "address": "456 Elm St"}
+  ],
+  "ratings_with_ingredient": {"service": 8.2, "quality": 7.5, "cleanliness": 8.0},
+  "ratings_without_ingredient": {"service": 7.8, "quality": 7.2, "cleanliness": 7.5}
+}
+```
+
 ## 5. Recommendations
 
 ### 5.1. Get Recommended Resturaants - `/recommendations/{username}` (GET)
