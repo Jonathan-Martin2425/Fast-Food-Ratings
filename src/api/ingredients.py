@@ -98,83 +98,104 @@ def get_food_ingredients(food_id: int):
 # Analyze the impact of an ingredient on the average ratings of brands.
 @router.get("/{ingredient_id}/impact_on_reviews")
 def get_ingredient_impact_on_reviews(ingredient_id: int):
-
-    with db.engine.begin() as connection:
-        ingredient_name = connection.execute(sqlalchemy.text("SELECT name FROM ingredients WHERE ingredient_id = :i_id"),{"i_id": ingredient_id}).scalar()
-        # Step 1: Fetch all brands and locations using the ingredient
-        ingredient_locations = connection.execute(
-            sqlalchemy.text("""
-                SELECT DISTINCT locations.l_id, brands.name AS brand_name, locations.address
-                FROM ingredients
-                JOIN food ON food.f_id = ingredients.food_id
-                JOIN locations ON locations.brand_id = food.brand_id
-                JOIN brands ON brands.b_id = locations.brand_id
-                WHERE ingredients.ingredient_id = :ingredient_id
-            """),
-            {"ingredient_id": ingredient_id}
-        ).fetchall()
-
-        if not ingredient_locations:
-            raise HTTPException(
-                status_code=404, detail=f"No locations found using ingredient with ID {ingredient_id}"
-            )
-
-        # Step 2: Calculate average ratings for locations with the ingredient
-        with_ratings = connection.execute(
-            sqlalchemy.text("""
-                SELECT AVG(service_rating) AS avg_service, 
-                       AVG(quality_rating) AS avg_quality, 
-                       AVG(cleanliness_rating) AS avg_cleanliness
-                FROM reviews
-                WHERE location_id IN (
-                    SELECT locations.l_id
+    try:
+        with db.engine.begin() as connection:
+            # Step 1: Fetch all brands and locations using the ingredient
+            ingredient_locations = connection.execute(
+                sqlalchemy.text("""
+                    SELECT DISTINCT locations.l_id, brands.name AS brand_name, locations.address
                     FROM ingredients
                     JOIN food ON food.f_id = ingredients.food_id
                     JOIN locations ON locations.brand_id = food.brand_id
+                    JOIN brands ON brands.b_id = locations.brand_id
                     WHERE ingredients.ingredient_id = :ingredient_id
-                )
-            """),
-            {"ingredient_id": ingredient_id}
-        ).fetchone()
+                """),
+                {"ingredient_id": ingredient_id}
+            ).fetchall()
 
-        # Step 3: Calculate average ratings for locations without the ingredient
-        without_ratings = connection.execute(
-            sqlalchemy.text("""
-                SELECT AVG(service_rating) AS avg_service, 
-                       AVG(quality_rating) AS avg_quality, 
-                       AVG(cleanliness_rating) AS avg_cleanliness
-                FROM reviews
-                WHERE location_id NOT IN (
-                    SELECT locations.l_id
-                    FROM ingredients
-                    JOIN food ON food.f_id = ingredients.food_id
-                    JOIN locations ON locations.brand_id = food.brand_id
-                    WHERE ingredients.ingredient_id = :ingredient_id
+            if not ingredient_locations:
+                raise HTTPException(
+                    status_code=404, 
+                    detail=f"No locations found using ingredient with ID {ingredient_id}."
                 )
-            """),
-            {"ingredient_id": ingredient_id}
-        ).fetchone()
 
-        # Step 4: Format the response
-        response = {
-            "ingredient_id": ingredient_id,
-            "ingredient_name": ingredient_name,
-            "locations_with_ingredient": [
-                {"location_id": loc.l_id, "brand_name": loc.brand_name, "address": loc.address}
-                for loc in ingredient_locations
-            ],
-            "ratings_with_ingredient": {
-                "service": with_ratings.avg_service or 0,
-                "quality": with_ratings.avg_quality or 0,
-                "cleanliness": with_ratings.avg_cleanliness or 0,
-            },
-            "ratings_without_ingredient": {
-                "service": without_ratings.avg_service or 0,
-                "quality": without_ratings.avg_quality or 0,
-                "cleanliness": without_ratings.avg_cleanliness or 0,
-            },
-        }
-    return response
+            # Step 2: Calculate average ratings for locations with the ingredient
+            with_ratings = connection.execute(
+                sqlalchemy.text("""
+                    SELECT AVG(service_rating) AS avg_service, 
+                           AVG(quality_rating) AS avg_quality, 
+                           AVG(cleanliness_rating) AS avg_cleanliness
+                    FROM reviews
+                    WHERE location_id IN (
+                        SELECT locations.l_id
+                        FROM ingredients
+                        JOIN food ON food.f_id = ingredients.food_id
+                        JOIN locations ON locations.brand_id = food.brand_id
+                        WHERE ingredients.ingredient_id = :ingredient_id
+                    )
+                """),
+                {"ingredient_id": ingredient_id}
+            ).fetchone()
+
+            # Step 3: Calculate average ratings for locations without the ingredient
+            without_ratings = connection.execute(
+                sqlalchemy.text("""
+                    SELECT AVG(service_rating) AS avg_service, 
+                           AVG(quality_rating) AS avg_quality, 
+                           AVG(cleanliness_rating) AS avg_cleanliness
+                    FROM reviews
+                    WHERE location_id NOT IN (
+                        SELECT locations.l_id
+                        FROM ingredients
+                        JOIN food ON food.f_id = ingredients.food_id
+                        JOIN locations ON locations.brand_id = food.brand_id
+                        WHERE ingredients.ingredient_id = :ingredient_id
+                    )
+                """),
+                {"ingredient_id": ingredient_id}
+            ).fetchone()
+
+            # Step 4: Handle edge cases for no reviews
+            if not with_ratings and not without_ratings:
+                raise HTTPException(
+                    status_code=404, 
+                    detail=f"No reviews found for analysis with or without ingredient ID {ingredient_id}."
+                )
+
+            # Step 5: Format the response
+            response = {
+                "ingredient_id": ingredient_id,
+                "locations_with_ingredient": [
+                    {"location_id": loc.l_id, "brand_name": loc.brand_name, "address": loc.address}
+                    for loc in ingredient_locations
+                ],
+                "ratings_with_ingredient": {
+                    "service": with_ratings.avg_service or 0,
+                    "quality": with_ratings.avg_quality or 0,
+                    "cleanliness": with_ratings.avg_cleanliness or 0,
+                },
+                "ratings_without_ingredient": {
+                    "service": without_ratings.avg_service or 0,
+                    "quality": without_ratings.avg_quality or 0,
+                    "cleanliness": without_ratings.avg_cleanliness or 0,
+                },
+            }
+
+        return response
+
+    except sqlalchemy.exc.SQLAlchemyError as e:
+        # Catch any database-related errors
+        raise HTTPException(
+            status_code=500,
+            detail=f"An unexpected database error occurred: {str(e)}"
+        )
+    except Exception as e:
+        # Catch any other unexpected errors
+        raise HTTPException(
+            status_code=500,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
+
 
 
 
